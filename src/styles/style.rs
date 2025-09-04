@@ -33,7 +33,7 @@ pub struct Style<'a> {
     ///
     /// This identifier is used throughout the document to apply style in content.
     #[xml(attr = "w:styleId")]
-    pub style_id: Cow<'a, str>,
+    pub style_id: Option<Cow<'a, str>>,
     #[xml(attr = "w:default")]
     pub default: Option<bool>,
     #[xml(attr = "w:customStyle")]
@@ -98,7 +98,7 @@ impl<'a> Style<'a> {
     pub fn new<T: Into<Cow<'a, str>>>(ty: StyleType, style_id: T) -> Self {
         Style {
             ty: Some(ty),
-            style_id: style_id.into(),
+            style_id: Some(style_id.into()),
             default: None,
             custom_style: None,
             name: None,
