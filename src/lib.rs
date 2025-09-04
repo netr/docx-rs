@@ -104,6 +104,12 @@ pub use crate::error::{DocxError, DocxResult};
 pub mod rounded_float {
     use std::num::ParseFloatError;
     pub fn from_xml(mode: &str) -> hard_xml::XmlResult<isize> {
+        // Try parsing as isize first to avoid precision loss
+        if let Ok(i) = mode.parse::<isize>() {
+            return Ok(i);
+        }
+
+        // Fallback to f64 parsing for floating point values
         let f: f64 = mode
             .parse()
             .map_err(|e: ParseFloatError| hard_xml::XmlError::FromStr(e.into()))?;
