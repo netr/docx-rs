@@ -17,8 +17,8 @@ pub struct Hyperlink<'a> {
     #[xml(attr = "w:anchor")]
     pub anchor: Option<Cow<'a, str>>,
     #[xml(child = "w:r")]
-    /// Link content
-    pub content: Option<Run<'a>>,
+    /// Link content - can contain multiple runs
+    pub content: Vec<Run<'a>>,
     #[xml(child = "w:dir")]
     // Link can contain a bi-directional embedding layer
     pub bidirectional_embedding: Option<BidirectionalEmbedding<'a>>,
@@ -27,7 +27,7 @@ pub struct Hyperlink<'a> {
 impl<'a> Hyperlink<'a> {
     __setter!(id: Option<Cow<'a, str>>);
     __setter!(anchor: Option<Cow<'a, str>>);
-    __setter!(content: Option<Run<'a>>);
+    __setter!(content: Vec<Run<'a>>);
 
     pub fn text(&self) -> String {
         self.iter_text()
@@ -68,6 +68,8 @@ __xml_test_suites!(
     r#"<w:hyperlink r:id="id"/>"#,
     Hyperlink::default().anchor("anchor"),
     r#"<w:hyperlink w:anchor="anchor"/>"#,
-    Hyperlink::default().content(Run::default()),
+    Hyperlink::default().content(vec![Run::default()]),
     r#"<w:hyperlink><w:r/></w:hyperlink>"#,
+    Hyperlink::default().content(vec![Run::default(), Run::default().push_text("test")]),
+    r#"<w:hyperlink><w:r/><w:r><w:t>test</w:t></w:r></w:hyperlink>"#,
 );
