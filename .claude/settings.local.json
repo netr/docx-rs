@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(done)",
+      "Bash(while read file)",
+      "Bash(unzip:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

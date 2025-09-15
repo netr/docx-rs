@@ -292,7 +292,7 @@ pub struct SuppressOverlap {
 #[xml(tag = "w:outlineLvl")]
 pub struct OutlineLvl {
     #[xml(attr = "w:val", with = "crate::rounded_float")]
-    pub value: Option<isize>,
+    pub value: isize,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]

@@ -3,7 +3,7 @@ extern crate docx_rust;
 use docx_rust::{
     document::{BodyContent, ParagraphContent, RunContent},
     rels::TargetMode,
-    DocxFile,
+    DocxError, DocxFile,
 };
 use std::collections::HashMap;
 use std::fs::read_dir;
@@ -182,6 +182,70 @@ fn read_image() {
             _ => (),
         }
     }
+}
+
+#[test]
+fn read_broke_docx() {
+    // Test for broke.docx that was previously causing issues
+    let path = std::path::Path::new("./tests/bbb/broke.docx");
+
+    // Test file loading
+    let book = match DocxFile::from_file(path) {
+        Ok(book) => book,
+        Err(e) => {
+            panic!("Failed to load broke.docx: {:?}", e);
+        }
+    };
+
+    // Test document parsing - this is where the error occurs
+    let docx = match book.parse() {
+        Ok(docx) => docx,
+        Err(e) => {
+            // Enhanced error reporting
+            match &e {
+                DocxError::Xml(xml_err) => {
+                    println!("XML Error details: {:?}", xml_err);
+                    match xml_err {
+                        hard_xml::XmlError::FromStr(parse_err) => {
+                            println!("Parse error details: {:?}", parse_err);
+                            println!(
+                                "Error kind: {:?}",
+                                parse_err.downcast_ref::<std::num::ParseIntError>()
+                            );
+                            println!(
+                                "Error kind: {:?}",
+                                parse_err.downcast_ref::<std::num::ParseFloatError>()
+                            );
+                        }
+                        _ => println!("Other XML error type: {:?}", xml_err),
+                    }
+                }
+                _ => println!("Non-XML error: {:?}", e),
+            }
+            panic!("Failed to parse broke.docx: {:?}", e);
+        }
+    };
+
+    // Basic validation that the document can be parsed without errors
+    assert!(!docx.document.body.content.is_empty());
+
+    // Test that we can extract text from the document
+    let text = docx.document.body.text();
+    assert!(!text.is_empty());
+
+    // Test that we can perform text replacement operations
+    let mut docx_copy = book.parse().unwrap();
+    docx_copy
+        .document
+        .body
+        .replace_text_simple("test", "replacement");
+
+    // Verify the document can still be written after modifications
+    let output_path = std::path::Path::new("./tests/bbb/broke_test_output.docx");
+    let _result = docx_copy.write_file(output_path);
+
+    // Clean up the test output file
+    let _ = std::fs::remove_file(output_path);
 }
 
 #[tokio::test]
