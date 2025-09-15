@@ -14,12 +14,12 @@ use crate::__xml_test_suites;
 #[xml(tag = "w:gridCol")]
 pub struct GridColumn {
     #[xml(attr = "w:w", with = "crate::rounded_float")]
-    pub width: isize,
+    pub width: Option<isize>,
 }
 
 impl From<isize> for GridColumn {
     fn from(width: isize) -> GridColumn {
-        GridColumn { width }
+        GridColumn { width: Some(width) }
     }
 }
 

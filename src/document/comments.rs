@@ -30,7 +30,7 @@ pub struct Comment<'a> {
     pub id: Option<isize>,
 
     #[xml(attr = "w:author")]
-    pub author: Cow<'a, str>,
+    pub author: Option<Cow<'a, str>>,
 
     // Specifies the body of the comment.
     #[xml(child = "w:p")]

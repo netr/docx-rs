@@ -95,9 +95,9 @@ pub struct WrapSquare {}
 #[xml(tag = "wp:wrapTight")]
 pub struct WrapTight {
     #[xml(attr = "wrapText")]
-    pub wrap_text: WrapTextType,
+    pub wrap_text: Option<WrapTextType>,
     #[xml(child = "wp:wrapPolygon")]
-    pub wrap_polygon: WrapPolygon,
+    pub wrap_polygon: Option<WrapPolygon>,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -107,7 +107,7 @@ pub struct WrapPolygon {
     #[xml(attr = "edited")]
     pub edited: Option<bool>,
     #[xml(child = "wp:start")]
-    pub start: WrapPolygonStart,
+    pub start: Option<WrapPolygonStart>,
     #[xml(child = "wp:lineTo")]
     pub lineto: Vec<WrapPolygonLineTo>,
 }

@@ -322,7 +322,7 @@ pub struct SrgbClr {
 #[xml(tag = "a:alpha")]
 pub struct Alpha {
     #[xml(attr = "val")]
-    pub value: usize,
+    pub value: Option<usize>,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -439,7 +439,7 @@ pub struct SchemeClr {
 #[xml(tag = "a:lumMod")]
 pub struct LuminanceModulation {
     #[xml(attr = "val", with = "crate::rounded_float")]
-    pub val: isize,
+    pub val: Option<isize>,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -447,7 +447,7 @@ pub struct LuminanceModulation {
 #[xml(tag = "a:satMod")]
 pub struct SaturationModulation {
     #[xml(attr = "val", with = "crate::rounded_float")]
-    pub val: isize,
+    pub val: Option<isize>,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -455,7 +455,7 @@ pub struct SaturationModulation {
 #[xml(tag = "a:tint")]
 pub struct Tint {
     #[xml(attr = "val", with = "crate::rounded_float")]
-    pub val: isize,
+    pub val: Option<isize>,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -463,7 +463,7 @@ pub struct Tint {
 #[xml(tag = "a:shade")]
 pub struct Shade {
     #[xml(attr = "val", with = "crate::rounded_float")]
-    pub val: isize,
+    pub val: Option<isize>,
 }
 
 #[derive(Debug, Default, Clone)]

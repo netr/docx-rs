@@ -10,11 +10,11 @@ use crate::__setter;
 pub struct CommentRangeStart<'a> {
     /// Specifies a unique identifier for the comment.
     #[xml(attr = "w:id")]
-    pub id: Cow<'a, str>,
+    pub id: Option<Cow<'a, str>>,
 }
 
 impl<'a> CommentRangeStart<'a> {
-    __setter!(id: Cow<'a, str>);
+    __setter!(id: Option<Cow<'a, str>>);
 }
 
 /// End of comment
@@ -24,11 +24,11 @@ impl<'a> CommentRangeStart<'a> {
 pub struct CommentRangeEnd<'a> {
     /// Specifies a unique identifier for the comment.
     #[xml(attr = "w:id")]
-    pub id: Cow<'a, str>,
+    pub id: Option<Cow<'a, str>>,
 }
 
 impl<'a> CommentRangeEnd<'a> {
-    __setter!(id: Cow<'a, str>);
+    __setter!(id: Option<Cow<'a, str>>);
 }
 
 // __xml_test_suites!(
