@@ -1058,9 +1058,9 @@ __define_struct_vec! {
 #[xml(tag = "a:lin")]
 pub struct LinearGradientFill {
     #[xml(attr = "ang", with = "crate::rounded_float")]
-    pub angle: isize,
+    pub angle: Option<isize>,
     #[xml(attr = "scaled")]
-    pub scaled: bool,
+    pub scaled: Option<bool>,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -1089,7 +1089,7 @@ __define_struct_vec! {
 #[xml(tag = "a:prstDash")]
 pub struct PresetDash {
     #[xml(attr = "val")]
-    pub val: PresetDashType,
+    pub val: Option<PresetDashType>,
 }
 
 #[derive(Debug, Default, Clone)]
@@ -1128,7 +1128,7 @@ __string_enum! {
 #[xml(tag = "a:miter")]
 pub struct MiterLineJoin {
     #[xml(attr = "lim", with = "crate::rounded_float")]
-    pub limit: isize,
+    pub limit: Option<isize>,
 }
 
 #[derive(Debug, Default, Clone)]
