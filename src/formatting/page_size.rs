@@ -12,9 +12,9 @@ use hard_xml::{XmlRead, XmlWrite};
 #[xml(tag = "w:pgSz")]
 pub struct PageSize {
     #[xml(attr = "w:w", with = "crate::rounded_float")]
-    pub weight: isize,
+    pub weight: Option<isize>,
     #[xml(attr = "w:h", with = "crate::rounded_float")]
-    pub height: isize,
+    pub height: Option<isize>,
 }
 
 // impl<T: Into<isize>> From<T> for NumberingId {

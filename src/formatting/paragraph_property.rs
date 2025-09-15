@@ -292,7 +292,7 @@ pub struct SuppressOverlap {
 #[xml(tag = "w:outlineLvl")]
 pub struct OutlineLvl {
     #[xml(attr = "w:val", with = "crate::rounded_float")]
-    pub value: isize,
+    pub value: Option<isize>,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -300,7 +300,7 @@ pub struct OutlineLvl {
 #[xml(tag = "w:divId")]
 pub struct DivId {
     #[xml(attr = "w:val", with = "crate::rounded_float")]
-    pub value: isize,
+    pub value: Option<isize>,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -316,7 +316,7 @@ pub struct CnfStyle<'a> {
 #[xml(tag = "w:pPrChange")]
 pub struct RevisionParagraphProperty<'a> {
     #[xml(attr = "w:id", with = "crate::rounded_float")]
-    pub id: isize,
+    pub id: Option<isize>,
     #[xml(attr = "w:author")]
     pub author: Cow<'a, str>,
     #[xml(attr = "w:date")]
