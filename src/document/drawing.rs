@@ -5,6 +5,7 @@ use std::borrow::Cow;
 use derive_more::From;
 use hard_xml::{XmlRead, XmlWrite};
 
+use crate::document::Paragraph;
 use crate::{__define_enum, __string_enum};
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -270,6 +271,9 @@ pub struct GraphicData<'a> {
     // graphic data can have any element in any namespace as a child
     #[xml(child = "pic:pic")]
     pub children: Vec<Picture<'a>>,
+    // Word 2010+ Wordprocessing Shape, can contain text box content
+    #[xml(child = "wps:wsp")]
+    pub wps: Vec<WpsWsp<'a>>,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -284,6 +288,30 @@ pub struct Picture<'a> {
     pub fill: BlipFill<'a>,
     #[xml(child = "pic:spPr")]
     pub sp_pr: SpPr<'a>,
+}
+
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
+#[cfg_attr(test, derive(PartialEq))]
+#[xml(tag = "wps:wsp")]
+pub struct WpsWsp<'a> {
+    #[xml(child = "wps:txbx")]
+    pub txbx: Option<WpsTxbx<'a>>,
+}
+
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
+#[cfg_attr(test, derive(PartialEq))]
+#[xml(tag = "wps:txbx")]
+pub struct WpsTxbx<'a> {
+    #[xml(child = "w:txbxContent")]
+    pub content: Option<WpsTxbxContent<'a>>,
+}
+
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
+#[cfg_attr(test, derive(PartialEq))]
+#[xml(tag = "w:txbxContent")]
+pub struct WpsTxbxContent<'a> {
+    #[xml(child = "w:p")]
+    pub paragraphs: Vec<Paragraph<'a>>,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]

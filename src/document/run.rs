@@ -6,8 +6,8 @@ use std::borrow::{Borrow, Cow};
 use crate::{
     __setter, __xml_test_suites,
     document::{
-        drawing::Drawing, field_char::FieldChar, instrtext::InstrText, r#break::Break,
-        r#break::LastRenderedPageBreak, tab::Tab, text::Text,
+        alternate::AlternateContent, drawing::Drawing, field_char::FieldChar, instrtext::InstrText,
+        r#break::Break, r#break::LastRenderedPageBreak, tab::Tab, text::Text,
     },
     formatting::CharacterProperty,
     DocxResult, __define_enum, __define_struct,
@@ -80,6 +80,7 @@ pub struct Run<'a> {
         child = "w:endnoteReference", //Endnote Reference
         child = "w:commentReference", //Comment Content Reference Mark
         child = "w:drawing", //DrawingML Object
+        child = "mc:AlternateContent", // Compatibility wrapper
         child = "w:ptab", //Absolute Position Tab Character
         child = "w:lastRenderedPageBreak", //Position of Last Calculated Page Break
     )]
@@ -241,6 +242,8 @@ pub enum RunContent<'a> {
     CommentReference(CommentReference<'a>),
     #[xml(tag = "w:drawing")]
     Drawing(Drawing<'a>),
+    #[xml(tag = "mc:AlternateContent")]
+    AlternateContent(AlternateContent<'a>),
     #[xml(tag = "w:ptab")]
     PTab(PTab),
     #[xml(tag = "w:lastRenderedPageBreak")]

@@ -3,7 +3,7 @@ use hard_xml::{XmlRead, XmlWrite};
 use std::borrow::Borrow;
 
 use crate::__xml_test_suites;
-use crate::document::{Paragraph, Run, Table, TableCell};
+use crate::document::{Drawing, Paragraph, ParagraphContent, Run, RunContent, Table, TableCell};
 use crate::formatting::SectionProperty;
 
 use super::SDT;
@@ -27,18 +27,20 @@ impl<'a> Body<'a> {
     }
 
     pub fn text(&self) -> String {
-        let v: Vec<_> = self
-            .content
-            .iter()
-            .filter_map(|content| match content {
-                BodyContent::Paragraph(para) => Some(para.text()),
-                BodyContent::Table(_) => None,
-                BodyContent::SectionProperty(_) => None,
-                BodyContent::Sdt(sdt) => Some(sdt.text()),
-                BodyContent::TableCell(_) => None,
-                BodyContent::Run(_) => None,
-            })
-            .collect();
+        let mut v: Vec<String> = Vec::new();
+        for content in &self.content {
+            match content {
+                BodyContent::Paragraph(para) => {
+                    v.push(para.text());
+                    v.extend(extract_textbox_text_from_paragraph(para));
+                }
+                BodyContent::Table(_) => {}
+                BodyContent::SectionProperty(_) => {}
+                BodyContent::Sdt(sdt) => v.push(sdt.text()),
+                BodyContent::TableCell(_) => {}
+                BodyContent::Run(_) => {}
+            }
+        }
         v.join("\r\n")
     }
 
@@ -89,6 +91,70 @@ impl<'a> Body<'a> {
     //         })
     //         .flatten()
     // }
+}
+
+fn extract_textbox_text_from_paragraph<'a>(paragraph: &'a Paragraph<'a>) -> Vec<String> {
+    let mut results: Vec<String> = Vec::new();
+    for para_content in &paragraph.content {
+        if let ParagraphContent::Run(run) = para_content {
+            for run_content in &run.content {
+                match run_content {
+                    RunContent::Drawing(drawing) => {
+                        collect_text_from_drawing(drawing, &mut results);
+                    }
+                    RunContent::AlternateContent(ac) => {
+                        for choice in &ac.choices {
+                            for drawing in &choice.drawings {
+                                collect_text_from_drawing(drawing, &mut results);
+                            }
+                        }
+                        if let Some(fallback) = &ac.fallback {
+                            for drawing in &fallback.drawings {
+                                collect_text_from_drawing(drawing, &mut results);
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
+    results
+}
+
+fn collect_text_from_drawing<'a>(drawing: &'a Drawing<'a>, out: &mut Vec<String>) {
+    if let Some(inline) = &drawing.inline {
+        if let Some(graphic) = &inline.graphic {
+            for wsp in &graphic.data.wps {
+                if let Some(txbx) = &wsp.txbx {
+                    if let Some(content) = &txbx.content {
+                        for p in &content.paragraphs {
+                            let t = p.text();
+                            if !t.is_empty() {
+                                out.push(t);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if let Some(anchor) = &drawing.anchor {
+        if let Some(graphic) = &anchor.graphic {
+            for wsp in &graphic.data.wps {
+                if let Some(txbx) = &wsp.txbx {
+                    if let Some(content) = &txbx.content {
+                        for p in &content.paragraphs {
+                            let t = p.text();
+                            if !t.is_empty() {
+                                out.push(t);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 /// A set of elements that can be contained in the body
