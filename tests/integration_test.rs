@@ -21,6 +21,62 @@ fn read_and_replace() {
 }
 
 #[test]
+fn complex_docx_alternatecontent_images_and_textboxes_current_behavior() {
+    let path = std::path::Path::new("./tests/bbb/complex.docx");
+    let book = DocxFile::from_file(path).unwrap();
+    let docx = book.parse().unwrap();
+
+    // Collect all embedded image rIds discovered through parsed drawings
+    let mut embeds: Vec<String> = Vec::new();
+    for content in &docx.document.body.content {
+        match content {
+            BodyContent::Paragraph(paragraph) => {
+                for para_content in &paragraph.content {
+                    match para_content {
+                        ParagraphContent::Run(run) => {
+                            for run_content in &run.content {
+                                if let RunContent::Drawing(drawing) = run_content {
+                                    if let Some(inline) = &drawing.inline {
+                                        if let Some(graphic) = &inline.graphic {
+                                            for pic in &graphic.data.children {
+                                                embeds.push(pic.fill.blip.embed.to_string());
+                                            }
+                                        }
+                                    }
+                                    if let Some(anchor) = &drawing.anchor {
+                                        if let Some(graphic) = &anchor.graphic {
+                                            for pic in &graphic.data.children {
+                                                embeds.push(pic.fill.blip.embed.to_string());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+
+    // We expect regular drawings to include rId6, rId7, rId8, rId10 from complex.docx
+    assert!(embeds.contains(&"rId6".to_string()));
+    assert!(embeds.contains(&"rId7".to_string()));
+    assert!(embeds.contains(&"rId8".to_string()));
+    assert!(embeds.contains(&"rId10".to_string()));
+
+    // Current behavior: mc:AlternateContent fallback picture (rId9) is not parsed
+    assert!(!embeds.contains(&"rId9".to_string()));
+
+    // Current behavior: captions inside text boxes (wps:wsp > w:txbxContent) are not included in body.text()
+    let text = docx.document.body.text();
+    assert!(!text.contains("This is how your customers view your business."));
+    assert!(!text.contains("95% of the time, this is how YOU view your business."));
+}
+
+#[test]
 fn replace_text_multiple() {
     // reader
     let path = std::path::Path::new("./tests/aaa/aa.docx");
