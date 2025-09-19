@@ -368,3 +368,31 @@ async fn read_write_async() {
     let writer = Vec::new();
     let _ = docx.write_async(writer.compat_write()).await.unwrap();
 }
+
+#[test]
+fn parse_influencer_marketing_document() {
+    let path = std::path::Path::new("./tests/bbb/Influencer Marketing for Software Products.docx");
+    let book = DocxFile::from_file(path);
+
+    // First check if we can open the file
+    assert!(book.is_ok(), "Should be able to open the document file");
+
+    let book = book.unwrap();
+    let docx_result = book.parse();
+
+    // Check for parsing errors
+    if let Err(err) = &docx_result {
+        println!("Parsing error: {:?}", err);
+        // For debugging, let's allow the test to fail but with more info
+        panic!("Failed to parse document: {:?}", err);
+    }
+
+    let docx = docx_result.unwrap();
+
+    // Basic test to ensure the document can be parsed without errors
+    let text = docx.document.body.text();
+    assert!(!text.is_empty(), "Document should contain text");
+
+    // Check that we can extract some meaningful content
+    assert!(text.len() > 100, "Document should contain substantial content");
+}

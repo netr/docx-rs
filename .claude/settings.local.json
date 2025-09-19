@@ -3,7 +3,8 @@
     "allow": [
       "Bash(done)",
       "Bash(while read file)",
-      "Bash(unzip:*)"
+      "Bash(unzip:*)",
+      "Bash(cargo test:*)"
     ],
     "deny": [],
     "ask": []
