@@ -8,6 +8,10 @@ use crate::{__setter, __xml_test_suites};
 pub struct TableCellProperty {
     #[xml(child = "w:tcW")]
     pub wide: Option<super::TableCellWidth>,
+    #[xml(child = "w:gridSpan")]
+    pub grid_span: Option<super::GridSpan>,
+    #[xml(child = "w:vMerge")]
+    pub v_merge: Option<super::VMerge>,
     #[xml(default, child = "w:vAlign")]
     pub v_align: super::VAlign,
 }
@@ -15,6 +19,8 @@ pub struct TableCellProperty {
 impl TableCellProperty {
     __setter!(v_align: super::VAlign);
     __setter!(wide: Option<super::TableCellWidth>);
+    __setter!(grid_span: Option<super::GridSpan>);
+    __setter!(v_merge: Option<super::VMerge>);
 }
 
 __xml_test_suites!(
