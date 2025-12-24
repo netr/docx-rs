@@ -24,7 +24,7 @@ use crate::{
 pub struct Table<'a> {
     #[xml(default, child = "w:tblPr")]
     pub property: TableProperty<'a>,
-    #[xml(child = "w:tblGrid")]
+    #[xml(default, child = "w:tblGrid")]
     pub grids: TableGrid,
     #[xml(child = "w:tr")]
     pub rows: Vec<TableRow<'a>>,

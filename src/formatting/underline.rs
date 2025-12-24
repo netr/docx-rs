@@ -1,7 +1,7 @@
 use hard_xml::{XmlRead, XmlWrite};
 use std::borrow::Cow;
 
-use crate::{__string_enum, __xml_test_suites};
+use crate::__xml_test_suites;
 
 /// Underline
 ///
@@ -91,26 +91,61 @@ pub enum UnderlineStyle {
     Words,
 }
 
-__string_enum! {
-    UnderlineStyle {
-        Dash = "dash",
-        DashDotDotHeavy = "dashDotDotHeavy",
-        DashDotHeavy = "dashDotHeavy",
-        DashedHeavy = "dashedHeavy",
-        DashLong = "dashLong",
-        DashLongHeavy = "dashLongHeavy",
-        DotDash = "dotDash",
-        DotDotDash = "dotDotDash",
-        Dotted = "dotted",
-        DottedHeavy = "dottedHeavy",
-        Double = "double",
-        None = "none",
-        Single = "single",
-        Thick = "thick",
-        Wave = "wave",
-        WavyDouble = "wavyDouble",
-        WavyHeavy = "wavyHeavy",
-        Words = "words",
+impl std::fmt::Display for UnderlineStyle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            UnderlineStyle::Dash => write!(f, "dash"),
+            UnderlineStyle::DashDotDotHeavy => write!(f, "dashDotDotHeavy"),
+            UnderlineStyle::DashDotHeavy => write!(f, "dashDotHeavy"),
+            UnderlineStyle::DashedHeavy => write!(f, "dashedHeavy"),
+            UnderlineStyle::DashLong => write!(f, "dashLong"),
+            UnderlineStyle::DashLongHeavy => write!(f, "dashLongHeavy"),
+            UnderlineStyle::DotDash => write!(f, "dotDash"),
+            UnderlineStyle::DotDotDash => write!(f, "dotDotDash"),
+            UnderlineStyle::Dotted => write!(f, "dotted"),
+            UnderlineStyle::DottedHeavy => write!(f, "dottedHeavy"),
+            UnderlineStyle::Double => write!(f, "double"),
+            UnderlineStyle::None => write!(f, "none"),
+            UnderlineStyle::Single => write!(f, "single"),
+            UnderlineStyle::Thick => write!(f, "thick"),
+            UnderlineStyle::Wave => write!(f, "wave"),
+            UnderlineStyle::WavyDouble => write!(f, "wavyDouble"),
+            UnderlineStyle::WavyHeavy => write!(f, "wavyHeavy"),
+            UnderlineStyle::Words => write!(f, "words"),
+        }
+    }
+}
+
+impl std::str::FromStr for UnderlineStyle {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            // Handle empty string as None (some DOCX files have w:val="")
+            "" => Ok(UnderlineStyle::None),
+            "dash" => Ok(UnderlineStyle::Dash),
+            "dashDotDotHeavy" => Ok(UnderlineStyle::DashDotDotHeavy),
+            "dashDotHeavy" => Ok(UnderlineStyle::DashDotHeavy),
+            "dashedHeavy" => Ok(UnderlineStyle::DashedHeavy),
+            "dashLong" => Ok(UnderlineStyle::DashLong),
+            "dashLongHeavy" => Ok(UnderlineStyle::DashLongHeavy),
+            "dotDash" => Ok(UnderlineStyle::DotDash),
+            "dotDotDash" => Ok(UnderlineStyle::DotDotDash),
+            "dotted" => Ok(UnderlineStyle::Dotted),
+            "dottedHeavy" => Ok(UnderlineStyle::DottedHeavy),
+            "double" => Ok(UnderlineStyle::Double),
+            "none" => Ok(UnderlineStyle::None),
+            "single" => Ok(UnderlineStyle::Single),
+            "thick" => Ok(UnderlineStyle::Thick),
+            "wave" => Ok(UnderlineStyle::Wave),
+            "wavyDouble" => Ok(UnderlineStyle::WavyDouble),
+            "wavyHeavy" => Ok(UnderlineStyle::WavyHeavy),
+            "words" => Ok(UnderlineStyle::Words),
+            s => Err(format!(
+                "Unknown Value. Found `{}`, Expected one of: dash, dashDotDotHeavy, dashDotHeavy, dashedHeavy, dashLong, dashLongHeavy, dotDash, dotDotDash, dotted, dottedHeavy, double, none, single, thick, wave, wavyDouble, wavyHeavy, words",
+                s,
+            ))
+        }
     }
 }
 
