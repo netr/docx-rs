@@ -19,8 +19,9 @@ use crate::__xml_test_suites;
 pub struct Underline<'a> {
     #[xml(attr = "w:color")]
     pub color: Option<Cow<'a, str>>,
+    /// Underline style - accepts any string value from the DOCX
     #[xml(attr = "w:val")]
-    pub val: Option<UnderlineStyle>,
+    pub val: Option<Cow<'a, str>>,
 }
 
 impl From<String> for Underline<'_> {
@@ -45,7 +46,7 @@ impl From<UnderlineStyle> for Underline<'_> {
     fn from(val: UnderlineStyle) -> Self {
         Underline {
             color: None,
-            val: Some(val),
+            val: Some(val.to_string().into()),
         }
     }
 }
@@ -54,7 +55,7 @@ impl From<(String, UnderlineStyle)> for Underline<'_> {
     fn from(val: (String, UnderlineStyle)) -> Self {
         Underline {
             color: Some(val.0.into()),
-            val: Some(val.1),
+            val: Some(val.1.to_string().into()),
         }
     }
 }
@@ -63,7 +64,7 @@ impl<'a> From<(&'a str, UnderlineStyle)> for Underline<'a> {
     fn from(val: (&'a str, UnderlineStyle)) -> Self {
         Underline {
             color: Some(val.0.into()),
-            val: Some(val.1),
+            val: Some(val.1.to_string().into()),
         }
     }
 }
@@ -116,38 +117,6 @@ impl std::fmt::Display for UnderlineStyle {
     }
 }
 
-impl std::str::FromStr for UnderlineStyle {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            // Handle empty string as None (some DOCX files have w:val="")
-            "" => Ok(UnderlineStyle::None),
-            "dash" => Ok(UnderlineStyle::Dash),
-            "dashDotDotHeavy" => Ok(UnderlineStyle::DashDotDotHeavy),
-            "dashDotHeavy" => Ok(UnderlineStyle::DashDotHeavy),
-            "dashedHeavy" => Ok(UnderlineStyle::DashedHeavy),
-            "dashLong" => Ok(UnderlineStyle::DashLong),
-            "dashLongHeavy" => Ok(UnderlineStyle::DashLongHeavy),
-            "dotDash" => Ok(UnderlineStyle::DotDash),
-            "dotDotDash" => Ok(UnderlineStyle::DotDotDash),
-            "dotted" => Ok(UnderlineStyle::Dotted),
-            "dottedHeavy" => Ok(UnderlineStyle::DottedHeavy),
-            "double" => Ok(UnderlineStyle::Double),
-            "none" => Ok(UnderlineStyle::None),
-            "single" => Ok(UnderlineStyle::Single),
-            "thick" => Ok(UnderlineStyle::Thick),
-            "wave" => Ok(UnderlineStyle::Wave),
-            "wavyDouble" => Ok(UnderlineStyle::WavyDouble),
-            "wavyHeavy" => Ok(UnderlineStyle::WavyHeavy),
-            "words" => Ok(UnderlineStyle::Words),
-            s => Err(format!(
-                "Unknown Value. Found `{}`, Expected one of: dash, dashDotDotHeavy, dashDotHeavy, dashedHeavy, dashLong, dashLongHeavy, dotDash, dotDotDash, dotted, dottedHeavy, double, none, single, thick, wave, wavyDouble, wavyHeavy, words",
-                s,
-            ))
-        }
-    }
-}
 
 __xml_test_suites!(
     Underline,
