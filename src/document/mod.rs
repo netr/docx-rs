@@ -35,6 +35,7 @@ pub use self::{
     alternate::*, body::*, bookmark_end::*, bookmark_start::*, comment_range::*, comments::*,
     document::*, drawing::*, endnotes::*, field_char::*, footer::*, footnotes::*, grid_column::*,
     header::*, header_footer_reference::*, hyperlink::*, instrtext::DelInstrText,
-    instrtext::InstrText, numbering::*, paragraph::*, r#break::*, run::*, sdt::*, tab::*, table::*,
-    table_cell::*, table_grid::*, table_row::*, text::*, theme::*,
+    instrtext::InstrText, instrtext::TextSpace as InstrTextSpace, numbering::*, paragraph::*,
+    r#break::*, run::*, sdt::*, tab::*, table::*, table_cell::*, table_grid::*, table_row::*,
+    text::*, theme::*,
 };

@@ -75,6 +75,39 @@ impl<'a> Relationships<'a> {
         }
     }
 
+    /// Add a relationship and return the assigned ID
+    pub fn add_rel_returning_id(&mut self, schema: &'a str, target: &'a str) -> String {
+        // Check if relationship already exists
+        if let Some(existing) = self.relationships.iter().find(|r| r.target == target) {
+            return existing.id.to_string();
+        }
+
+        let ids: Vec<_> = self
+            .relationships
+            .iter()
+            .map(|r| r.id.to_string())
+            .collect();
+
+        let len = self.relationships.len();
+
+        let mut available = false;
+        let mut id = len;
+        while !available {
+            id += 1;
+            let idstr = format!("rId{}", id);
+            available = !ids.contains(&idstr);
+        }
+
+        let id_str = format!("rId{}", id);
+        self.relationships.push(Relationship {
+            id: id_str.clone().into(),
+            target: target.into(),
+            ty: schema.into(),
+            target_mode: None,
+        });
+        id_str
+    }
+
     pub fn add_rel_with_target_mode(
         &mut self,
         schema: &'a str,
