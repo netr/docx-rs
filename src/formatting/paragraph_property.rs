@@ -33,8 +33,8 @@ pub struct ParagraphProperty<'a> {
     #[xml(child = "w:pageBreakBefore")]
     pub page_break_before: Option<PageBreakBefore>,
     ///  Text Frame Properties
-    //#[xml(child = "w:framePr")]
-    //pub frame_pr: Option<FramePr>,
+    #[xml(child = "w:framePr")]
+    pub frame_pr: Option<FramePr>,
     ///  Allow First/Last Line to Display on a Separate Page
     /// Specifies whether enable widow control
     #[xml(child = "w:widowControl")]
@@ -135,6 +135,20 @@ impl<'a> ParagraphProperty<'a> {
     __setter!(numbering: Option<NumberingProperty<'a>>);
     __setter!(spacing: Option<Spacing>);
     __setter!(indent: Option<Indent>);
+    __setter!(frame_pr: Option<FramePr>);
+
+    /// Apply a native DOCX drop cap frame to this paragraph.
+    ///
+    /// This emits `<w:framePr w:dropCap="drop" w:lines="..."/>`, which Word
+    /// renders as a standard paragraph drop cap.
+    pub fn drop_cap(mut self, lines: isize) -> Self {
+        self.frame_pr = Some(
+            FramePr::default()
+                .drop_cap(FrameDropCap::Drop)
+                .lines(lines),
+        );
+        self
+    }
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -173,6 +187,32 @@ pub struct KeepLines {
 pub struct PageBreakBefore {
     #[xml(attr = "w:val")]
     pub value: Option<bool>,
+}
+
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
+#[cfg_attr(test, derive(PartialEq))]
+#[xml(tag = "w:framePr")]
+pub struct FramePr {
+    /// Drop cap mode for this paragraph frame.
+    /// Typical values are "drop" (in-text) and "margin" (in margin area).
+    #[xml(attr = "w:dropCap")]
+    pub drop_cap: Option<FrameDropCap>,
+    /// Number of lines the drop cap spans.
+    #[xml(attr = "w:lines", with = "crate::rounded_float")]
+    pub lines: Option<isize>,
+}
+
+impl FramePr {
+    __setter!(drop_cap: Option<FrameDropCap>);
+    __setter!(lines: Option<isize>);
+}
+
+__define_enum! {
+    FrameDropCap {
+        None = "none",
+        Drop = "drop",
+        Margin = "margin",
+    }
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -343,8 +383,8 @@ pub struct PreviousParagraphProperty<'a> {
     #[xml(child = "w:pageBreakBefore")]
     pub page_break_before: Option<PageBreakBefore>,
     ///  Text Frame Properties
-    //#[xml(child = "w:framePr")]
-    //pub frame_pr: Option<FramePr>,
+    #[xml(child = "w:framePr")]
+    pub frame_pr: Option<FramePr>,
     ///  Allow First/Last Line to Display on a Separate Page
     /// Specifies whether enable widow control
     #[xml(child = "w:widowControl")]
@@ -486,4 +526,8 @@ __xml_test_suites!(
     r#"<w:pPr><w:pBdr/></w:pPr>"#,
     ParagraphProperty::default().numbering(NumberingProperty::default()),
     r#"<w:pPr><w:numPr/></w:pPr>"#,
+    ParagraphProperty::default().frame_pr(FramePr::default()),
+    r#"<w:pPr><w:framePr/></w:pPr>"#,
+    ParagraphProperty::default().drop_cap(3),
+    r#"<w:pPr><w:framePr w:dropCap="drop" w:lines="3"/></w:pPr>"#,
 );
