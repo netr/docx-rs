@@ -832,43 +832,36 @@ impl DocxFile {
     }
 }
 
-/// Sanitize XML content to handle common malformations in DOCX files.
+/// Normalize XML content using quick-xml to handle common malformations in DOCX files.
 ///
-/// Fixes closing tags with trailing whitespace (e.g., `</w:hyperlink >` → `</w:hyperlink>`),
-/// which some DOCX generators produce and which cause XML parsing failures.
+/// Streams the XML through quick-xml's Reader → Writer pipeline, which handles:
+/// - Closing tags with trailing whitespace (e.g., `</w:hyperlink >` → `</w:hyperlink>`)
+/// - Other structural normalizations that quick-xml performs
+///
+/// If normalization fails for any reason, returns the original XML unchanged.
 fn sanitize_xml(xml: String) -> String {
-    // Fast path: if there are no closing tags with spaces before '>', return as-is
-    if !xml.contains("/ >") && !xml.contains(" >") {
-        return xml;
-    }
+    use quick_xml::events::Event;
+    use quick_xml::reader::Reader;
+    use quick_xml::writer::Writer;
+    use std::io::Cursor;
 
-    let bytes = xml.as_bytes();
-    let mut result = Vec::with_capacity(bytes.len());
-    let mut i = 0;
-    while i < bytes.len() {
-        if i + 1 < bytes.len() && bytes[i] == b'<' && bytes[i + 1] == b'/' {
-            // Start of closing tag — copy "</"
-            result.push(b'<');
-            result.push(b'/');
-            i += 2;
-            // Copy tag name characters
-            while i < bytes.len() && bytes[i] != b'>' && !bytes[i].is_ascii_whitespace() {
-                result.push(bytes[i]);
-                i += 1;
+    let mut reader = Reader::from_str(&xml);
+    reader.config_mut().trim_markup_names_in_closing_tags = true;
+    reader.config_mut().check_end_names = false;
+
+    let mut writer = Writer::new(Cursor::new(Vec::new()));
+
+    loop {
+        match reader.read_event() {
+            Ok(Event::Eof) => break,
+            Ok(event) => {
+                if writer.write_event(event).is_err() {
+                    return xml;
+                }
             }
-            // Skip any whitespace before '>'
-            while i < bytes.len() && bytes[i].is_ascii_whitespace() {
-                i += 1;
-            }
-            // Copy the '>' if present
-            if i < bytes.len() && bytes[i] == b'>' {
-                result.push(b'>');
-                i += 1;
-            }
-        } else {
-            result.push(bytes[i]);
-            i += 1;
+            Err(_) => return xml,
         }
     }
-    String::from_utf8(result).unwrap_or(xml)
+
+    String::from_utf8(writer.into_inner().into_inner()).unwrap_or(xml)
 }
