@@ -123,16 +123,18 @@ macro_rules! __define_struct {
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __define_enum {
-    ($name:ident { $($variant:ident = $value:expr, )* }) => {
+    ($name:ident { $first_variant:ident = $first_value:expr, $($variant:ident = $value:expr, )* }) => {
         #[derive(Debug, Clone)]
         #[cfg_attr(test, derive(PartialEq))]
         pub enum $name {
+            $first_variant,
             $( $variant, )*
         }
 
         impl std::fmt::Display for $name {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 match *self {
+                    $name::$first_variant => write!(f, $first_value),
                     $( $name::$variant => write!(f, $value), )*
                 }
             }
@@ -143,12 +145,15 @@ macro_rules! __define_enum {
 
             fn from_str(s: &str) -> Result<Self, Self::Err> {
                 match s {
+                    $first_value => Ok($name::$first_variant),
                     $($value => Ok($name::$variant),)*
-                    s => Err(format!(
-                        "Unkown Value. Found `{}`, Expected `{}`",
-                        s,
-                        stringify!($($value,)*)
-                    ))
+                    _ => {
+                        log::warn!(
+                            "Unknown {} value '{}', falling back to default. Expected one of: {}",
+                            stringify!($name), s, stringify!($first_value, $($value,)*)
+                        );
+                        Ok($name::$first_variant)
+                    }
                 }
             }
         }
@@ -158,10 +163,11 @@ macro_rules! __define_enum {
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __string_enum {
-    ($name:ident { $($variant:ident = $value:expr, )* }) => {
+    ($name:ident { $first_variant:ident = $first_value:expr, $($variant:ident = $value:expr, )* }) => {
         impl std::fmt::Display for $name {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 match *self {
+                    $name::$first_variant => write!(f, $first_value),
                     $( $name::$variant => write!(f, $value), )*
                 }
             }
@@ -172,12 +178,15 @@ macro_rules! __string_enum {
 
             fn from_str(s: &str) -> Result<Self, Self::Err> {
                 match s {
+                    $first_value => Ok($name::$first_variant),
                     $($value => Ok($name::$variant),)*
-                    s => Err(format!(
-                        "Unkown Value. Found `{}`, Expected `{}`",
-                        s,
-                        stringify!($($value,)*)
-                    ))
+                    _ => {
+                        log::warn!(
+                            "Unknown {} value '{}', falling back to default. Expected one of: {}",
+                            stringify!($name), s, stringify!($first_value, $($value,)*)
+                        );
+                        Ok($name::$first_variant)
+                    }
                 }
             }
         }

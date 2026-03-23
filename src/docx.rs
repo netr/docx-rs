@@ -448,7 +448,7 @@ impl DocxFile {
                 let mut file = zip.by_name($name)?;
                 let mut buffer = String::new();
                 file.read_to_string(&mut buffer)?;
-                buffer
+                sanitize_xml(buffer)
             }};
         }
 
@@ -460,7 +460,7 @@ impl DocxFile {
                     Ok(mut file) => {
                         let mut buffer = String::new();
                         file.read_to_string(&mut buffer)?;
-                        Some(buffer)
+                        Some(sanitize_xml(buffer))
                     }
                 }
             };
@@ -476,7 +476,7 @@ impl DocxFile {
                         zip.by_name(f).ok().and_then(|mut file| {
                             let mut buffer = String::new();
                             file.read_to_string(&mut buffer).ok()?;
-                            Some((f.to_string(), buffer))
+                            Some((f.to_string(), sanitize_xml(buffer)))
                         })
                     })
                     .collect();
@@ -780,7 +780,7 @@ impl DocxFile {
                 ($field:expr) => {{
                     let mut buffer = String::new();
                     entry_reader.read_to_string_checked(&mut buffer).await?;
-                    $field = buffer.into();
+                    $field = sanitize_xml(buffer).into();
                 }};
             }
 
@@ -788,7 +788,7 @@ impl DocxFile {
                 ($field:expr) => {{
                     let mut buffer = String::new();
                     entry_reader.read_to_string_checked(&mut buffer).await?;
-                    $field.push((filename, buffer));
+                    $field.push((filename, sanitize_xml(buffer)));
                 }};
             }
 
@@ -830,4 +830,45 @@ impl DocxFile {
 
         Ok(docx)
     }
+}
+
+/// Sanitize XML content to handle common malformations in DOCX files.
+///
+/// Fixes closing tags with trailing whitespace (e.g., `</w:hyperlink >` → `</w:hyperlink>`),
+/// which some DOCX generators produce and which cause XML parsing failures.
+fn sanitize_xml(xml: String) -> String {
+    // Fast path: if there are no closing tags with spaces before '>', return as-is
+    if !xml.contains("/ >") && !xml.contains(" >") {
+        return xml;
+    }
+
+    let bytes = xml.as_bytes();
+    let mut result = Vec::with_capacity(bytes.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        if i + 1 < bytes.len() && bytes[i] == b'<' && bytes[i + 1] == b'/' {
+            // Start of closing tag — copy "</"
+            result.push(b'<');
+            result.push(b'/');
+            i += 2;
+            // Copy tag name characters
+            while i < bytes.len() && bytes[i] != b'>' && !bytes[i].is_ascii_whitespace() {
+                result.push(bytes[i]);
+                i += 1;
+            }
+            // Skip any whitespace before '>'
+            while i < bytes.len() && bytes[i].is_ascii_whitespace() {
+                i += 1;
+            }
+            // Copy the '>' if present
+            if i < bytes.len() && bytes[i] == b'>' {
+                result.push(b'>');
+                i += 1;
+            }
+        } else {
+            result.push(bytes[i]);
+            i += 1;
+        }
+    }
+    String::from_utf8(result).unwrap_or(xml)
 }

@@ -396,3 +396,42 @@ fn parse_influencer_marketing_document() {
     // Check that we can extract some meaningful content
     assert!(text.len() > 100, "Document should contain substantial content");
 }
+
+#[test]
+fn parse_unknown_enum_value_in_theme() {
+    // Regression: a theme with algn="b" (unknown PenAlignment value) on an
+    // outerShdw element should not crash the entire document parse.
+    // Previously this produced: "Unkown Value. Found `b`, Expected `"ctr", "in",`"
+    let path = std::path::Path::new("./tests/bbb/unknown_enum_value.docx");
+    let book = DocxFile::from_file(path).expect("Should open docx file");
+    let docx = book
+        .parse()
+        .expect("Should parse docx with unknown enum value in theme");
+
+    let text = docx.document.body.text();
+    assert!(
+        text.contains("Hello world from theme test"),
+        "Document text should be extractable despite unknown theme enum value"
+    );
+}
+
+#[test]
+fn parse_malformed_closing_tag_with_trailing_space() {
+    // Regression: a closing tag like </w:hyperlink > (with trailing space)
+    // should not cause a "mismatched XML tag" error.
+    let path = std::path::Path::new("./tests/bbb/malformed_closing_tag.docx");
+    let book = DocxFile::from_file(path).expect("Should open docx file");
+    let docx = book
+        .parse()
+        .expect("Should parse docx with trailing space in closing tag");
+
+    let text = docx.document.body.text();
+    assert!(
+        text.contains("Click here"),
+        "Hyperlink text should be extractable"
+    );
+    assert!(
+        text.contains("Normal text after hyperlink"),
+        "Text after hyperlink should be extractable"
+    );
+}
