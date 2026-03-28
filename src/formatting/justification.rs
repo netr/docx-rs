@@ -9,11 +9,11 @@ use crate::{__string_enum, __xml_test_suites};
 ///
 /// let jc = Justification::from(JustificationVal::Start);
 /// ```
-#[derive(Debug, XmlRead, XmlWrite, Clone)]
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:jc")]
 pub struct Justification {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: JustificationVal,
 }
 
@@ -23,9 +23,10 @@ impl From<JustificationVal> for Justification {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 pub enum JustificationVal {
+    #[default]
     Start,
     End,
     Center,

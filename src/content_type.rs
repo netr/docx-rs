@@ -98,17 +98,17 @@ impl<'a> XmlWrite for ContentTypes<'a> {
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[xml(tag = "Default")]
 pub struct DefaultContentType<'a> {
-    #[xml(attr = "Extension")]
+    #[xml(default, attr = "Extension")]
     pub ext: Cow<'a, str>,
-    #[xml(attr = "ContentType")]
+    #[xml(default, attr = "ContentType")]
     pub ty: Cow<'a, str>,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[xml(tag = "Override")]
 pub struct OverrideContentType<'a> {
-    #[xml(attr = "PartName")]
+    #[xml(default, attr = "PartName")]
     pub part: Cow<'a, str>,
-    #[xml(attr = "ContentType")]
+    #[xml(default, attr = "ContentType")]
     pub ty: Cow<'a, str>,
 }

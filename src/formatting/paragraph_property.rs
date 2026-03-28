@@ -155,7 +155,7 @@ impl<'a> ParagraphProperty<'a> {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:pStyle")]
 pub struct ParagraphStyleId<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 
@@ -347,7 +347,7 @@ pub struct DivId {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:cnfStyle")]
 pub struct CnfStyle<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 
@@ -357,7 +357,7 @@ pub struct CnfStyle<'a> {
 pub struct RevisionParagraphProperty<'a> {
     #[xml(attr = "w:id", with = "crate::rounded_float")]
     pub id: Option<isize>,
-    #[xml(attr = "w:author")]
+    #[xml(default, attr = "w:author")]
     pub author: Cow<'a, str>,
     #[xml(attr = "w:date")]
     pub date: Option<Cow<'a, str>>,

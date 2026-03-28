@@ -132,11 +132,11 @@ impl<'a> Style<'a> {
     __setter!(character: Option<CharacterProperty<'a>>);
 }
 
-#[derive(Debug, XmlRead, XmlWrite, Clone)]
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:name")]
 pub struct StyleName<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 
@@ -146,27 +146,27 @@ impl<'a, S: Into<Cow<'a, str>>> From<S> for StyleName<'a> {
     }
 }
 
-#[derive(Debug, XmlRead, XmlWrite, Clone)]
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:aliases")]
 pub struct Aliases<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 
-#[derive(Debug, XmlRead, XmlWrite, Clone)]
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:next")]
 pub struct Next<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 
-#[derive(Debug, XmlRead, XmlWrite, Clone)]
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:link")]
 pub struct Link<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 
@@ -218,19 +218,19 @@ pub struct PersonalReply {
     pub value: Option<bool>,
 }
 
-#[derive(Debug, XmlRead, XmlWrite, Clone)]
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:rsid")]
 pub struct Rsid<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 
-#[derive(Debug, XmlRead, XmlWrite, Clone)]
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:basedOn")]
 pub struct BasedOn<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 

@@ -299,11 +299,11 @@ pub enum CustClrChoice {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "a:scrgbClr")]
 pub struct ScrgbClr {
-    #[xml(attr = "r")]
+    #[xml(default, attr = "r")]
     pub r: u8,
-    #[xml(attr = "g")]
+    #[xml(default, attr = "g")]
     pub g: u8,
-    #[xml(attr = "b")]
+    #[xml(default, attr = "b")]
     pub b: u8,
 }
 
@@ -341,7 +341,7 @@ pub struct HslClr {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "a:sysClr")]
 pub struct SysClr {
-    #[xml(attr = "val")]
+    #[xml(default, attr = "val")]
     pub val: SysClrType,
     #[xml(attr = "lastClr")]
     pub last_color: Option<String>,
@@ -422,7 +422,7 @@ __string_enum! {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "a:schemeClr")]
 pub struct SchemeClr {
-    #[xml(attr = "val")]
+    #[xml(default, attr = "val")]
     pub val: SchemeClrType,
     #[xml(child = "a:lumMod")]
     pub lum_mod: Option<LuminanceModulation>,
@@ -828,7 +828,7 @@ pub struct ThemeElements<'a> {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "a:clrScheme")]
 pub struct ClrScheme<'a> {
-    #[xml(attr = "name")]
+    #[xml(default, attr = "name")]
     pub name: Cow<'a, str>,
 
     ///    Dark 1
@@ -964,9 +964,9 @@ pub struct Latin<'a> {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "a:font")]
 pub struct Font<'a> {
-    #[xml(attr = "script")]
+    #[xml(default, attr = "script")]
     pub script: Cow<'a, str>,
-    #[xml(attr = "typeface")]
+    #[xml(default, attr = "typeface")]
     pub typeface: Cow<'a, str>,
 }
 

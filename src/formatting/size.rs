@@ -9,11 +9,11 @@ use crate::__xml_test_suites;
 ///
 /// let sz = Size::from(42isize);
 /// ```
-#[derive(Debug, XmlRead, XmlWrite, Clone)]
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:sz")]
 pub struct Size {
-    #[xml(attr = "w:val", with = "crate::rounded_float")]
+    #[xml(default, attr = "w:val", with = "crate::rounded_float")]
     pub value: isize,
 }
 

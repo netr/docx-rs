@@ -7,7 +7,7 @@ use crate::{__setter, __xml_test_suites, formatting::BorderStyle};
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:bottom")]
 pub struct BottomBorder<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub style: super::BorderStyle,
     #[xml(attr = "w:color")]
     pub color: Option<Cow<'a, str>>,

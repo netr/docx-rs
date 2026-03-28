@@ -45,11 +45,11 @@ impl<'a> TableProperty<'a> {
     __setter!(width: Option<TableWidth>);
 }
 
-#[derive(Debug, XmlRead, XmlWrite, Clone)]
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:tblStyle")]
 pub struct TableStyleId<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 

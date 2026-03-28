@@ -20,7 +20,7 @@ use crate::{
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:font")]
 pub struct Font<'a> {
-    #[xml(attr = "w:name")]
+    #[xml(default, attr = "w:name")]
     pub name: Cow<'a, str>,
     #[xml(child = "w:charset")]
     pub charset: Option<Charset<'a>>,

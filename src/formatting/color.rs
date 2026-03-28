@@ -19,7 +19,7 @@ use crate::{__string_enum, __xml_test_suites};
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:color")]
 pub struct Color<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 

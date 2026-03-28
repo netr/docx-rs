@@ -164,11 +164,11 @@ impl<'a> CharacterProperty<'a> {
     __setter!(fonts: Option<Fonts>);
 }
 
-#[derive(Debug, XmlRead, XmlWrite, Clone)]
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:rStyle")]
 pub struct CharacterStyleId<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 
@@ -387,7 +387,7 @@ pub struct FitText {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:bdr")]
 pub struct TextBorder<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub style: super::BorderStyle,
     #[xml(attr = "w:color")]
     pub color: Option<Cow<'a, str>>,

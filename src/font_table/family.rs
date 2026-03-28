@@ -5,7 +5,7 @@ use std::borrow::Cow;
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:family")]
 pub struct Family<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 

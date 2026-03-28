@@ -88,7 +88,7 @@ pub struct PPr {
 #[xml(tag = "w:numFmt")]
 /// TODO Replace by enum NumberFormat
 pub struct NumFmt<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 
@@ -105,15 +105,15 @@ pub struct LevelStart {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:lvlText")]
 pub struct LevelText<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: Cow<'a, str>,
 }
 
-#[derive(Debug, XmlRead, XmlWrite, Clone)]
+#[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:lvlJc")]
 pub struct LevelJustification {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub value: JustificationVal,
 }
 

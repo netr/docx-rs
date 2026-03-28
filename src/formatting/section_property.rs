@@ -357,9 +357,9 @@ __define_enum! {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:sectPrChange")]
 pub struct Revision<'a> {
-    #[xml(attr = "w:id", with = "crate::rounded_float")]
+    #[xml(default, attr = "w:id", with = "crate::rounded_float")]
     pub id: isize,
-    #[xml(attr = "w:author")]
+    #[xml(default, attr = "w:author")]
     pub author: Cow<'a, str>,
     #[xml(attr = "w:date")]
     pub date: Option<Cow<'a, str>>,
@@ -446,7 +446,7 @@ __define_enum! {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:textDirection")]
 pub struct TextDirection {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub val: TextDirectionType,
 }
 
@@ -477,7 +477,7 @@ __string_enum! {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:vAlign")]
 pub struct VAlign {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub val: VAlignType,
 }
 
@@ -593,7 +593,7 @@ pub struct FootnoteProperty2 {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:footnote")]
 pub struct Footnote {
-    #[xml(attr = "w:id", with = "crate::rounded_float")]
+    #[xml(default, attr = "w:id", with = "crate::rounded_float")]
     pub id: isize,
 }
 
@@ -619,7 +619,7 @@ pub struct EndnoteProperty2 {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:endnote")]
 pub struct Endnote {
-    #[xml(attr = "w:id", with = "crate::rounded_float")]
+    #[xml(default, attr = "w:id", with = "crate::rounded_float")]
     pub id: isize,
 }
 
@@ -627,7 +627,7 @@ pub struct Endnote {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:numRestart")]
 pub struct NumRestart {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub val: NumRestartType,
 }
 
@@ -660,7 +660,7 @@ pub struct NumStart {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:numFmt")]
 pub struct NumFmt {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub ty: NumFmtType,
 }
 
@@ -799,7 +799,7 @@ __string_enum! {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:pos")]
 pub struct FootnotePosition {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub val: PositionType,
 }
 
@@ -826,7 +826,7 @@ __string_enum! {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:pos")]
 pub struct EndnotePosition {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub val: EndnotePositionType,
 }
 

@@ -328,7 +328,7 @@ pub struct SmartTagType {}
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:view")]
 pub struct View {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub val: ViewType,
 }
 
@@ -570,7 +570,7 @@ pub struct FormsDesign {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:attachedTemplate")]
 pub struct AttachedTemplate<'a> {
-    #[xml(attr = "r:id")]
+    #[xml(default, attr = "r:id")]
     pub val: Cow<'a, str>,
 }
 
@@ -854,7 +854,7 @@ pub struct NoPunctuationKerning {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:characterSpacingControl")]
 pub struct CharacterSpacingControl {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub val: CharacterSpacingControlType,
 }
 
@@ -1016,9 +1016,9 @@ pub struct DocVars<'a> {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:docVar")]
 pub struct DocVar<'a> {
-    #[xml(attr = "w:name")]
+    #[xml(default, attr = "w:name")]
     pub name: Cow<'a, str>,
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub val: Cow<'a, str>,
 }
 
@@ -1036,7 +1036,7 @@ pub struct Rsids<'a> {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:rsid")]
 pub struct Rsid<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub val: Cow<'a, str>,
 }
 
@@ -1044,7 +1044,7 @@ pub struct Rsid<'a> {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:rsidRoot")]
 pub struct RsidRoot<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub val: Cow<'a, str>,
 }
 
@@ -1109,7 +1109,7 @@ pub struct DoNotEmbedSmartTags {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:decimalSymbol")]
 pub struct DecimalSymbol<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub val: Cow<'a, str>,
 }
 
@@ -1117,7 +1117,7 @@ pub struct DecimalSymbol<'a> {
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:listSeparator")]
 pub struct ListSeparator<'a> {
-    #[xml(attr = "w:val")]
+    #[xml(default, attr = "w:val")]
     pub val: Cow<'a, str>,
 }
 

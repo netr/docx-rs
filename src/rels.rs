@@ -186,11 +186,11 @@ impl TargetMode {
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[xml(tag = "Relationship")]
 pub struct Relationship<'a> {
-    #[xml(attr = "Id")]
+    #[xml(default, attr = "Id")]
     pub id: Cow<'a, str>,
-    #[xml(attr = "Target")]
+    #[xml(default, attr = "Target")]
     pub target: Cow<'a, str>,
-    #[xml(attr = "Type")]
+    #[xml(default, attr = "Type")]
     pub ty: Cow<'a, str>,
     #[xml(attr = "TargetMode")]
     pub target_mode: Option<TargetMode>,
