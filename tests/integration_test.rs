@@ -394,7 +394,10 @@ fn parse_influencer_marketing_document() {
     assert!(!text.is_empty(), "Document should contain text");
 
     // Check that we can extract some meaningful content
-    assert!(text.len() > 100, "Document should contain substantial content");
+    assert!(
+        text.len() > 100,
+        "Document should contain substantial content"
+    );
 }
 
 #[test]

@@ -76,7 +76,7 @@ pub struct ConditionalTableProperty<'a> {
     #[xml(child = "w:trPr")]
     pub table_row: Option<crate::formatting::TableRowProperty>,
     #[xml(child = "w:tcPr")]
-    pub table_cell: Option<crate::formatting::TableCellProperty>,
+    pub table_cell: Option<crate::formatting::TableCellProperty<'a>>,
 }
 
 #[derive(Debug, Default, Clone)]

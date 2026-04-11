@@ -22,13 +22,13 @@ use crate::{__setter, __xml_test_suites, document::Paragraph, formatting::TableC
 #[xml(tag = "w:tc")]
 pub struct TableCell<'a> {
     #[xml(default, child = "w:tcPr")]
-    pub property: TableCellProperty,
+    pub property: TableCellProperty<'a>,
     #[xml(child = "w:p")]
     pub content: Vec<TableCellContent<'a>>,
 }
 
 impl<'a> TableCell<'a> {
-    __setter!(property: TableCellProperty);
+    __setter!(property: TableCellProperty<'a>);
 
     pub fn paragraph<T: Into<Paragraph<'a>>>(par: T) -> Self {
         TableCell {

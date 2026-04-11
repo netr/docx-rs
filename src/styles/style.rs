@@ -89,7 +89,7 @@ pub struct Style<'a> {
     #[xml(child = "w:trPr")]
     pub table_row: Option<crate::formatting::TableRowProperty>,
     #[xml(child = "w:tcPr")]
-    pub table_cell: Option<crate::formatting::TableCellProperty>,
+    pub table_cell: Option<crate::formatting::TableCellProperty<'a>>,
     #[xml(child = "w:tblStylePr")]
     pub conditional_table_property: Vec<crate::formatting::ConditionalTableProperty<'a>>,
 }

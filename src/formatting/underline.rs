@@ -117,7 +117,6 @@ impl std::fmt::Display for UnderlineStyle {
     }
 }
 
-
 __xml_test_suites!(
     Underline,
     Underline::default(),

@@ -142,11 +142,7 @@ impl<'a> ParagraphProperty<'a> {
     /// This emits `<w:framePr w:dropCap="drop" w:lines="..."/>`, which Word
     /// renders as a standard paragraph drop cap.
     pub fn drop_cap(mut self, lines: isize) -> Self {
-        self.frame_pr = Some(
-            FramePr::default()
-                .drop_cap(FrameDropCap::Drop)
-                .lines(lines),
-        );
+        self.frame_pr = Some(FramePr::default().drop_cap(FrameDropCap::Drop).lines(lines));
         self
     }
 }
