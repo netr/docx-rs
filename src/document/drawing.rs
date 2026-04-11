@@ -89,7 +89,26 @@ pub struct WrapNone {}
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "wp:wrapSquare")]
-pub struct WrapSquare {}
+pub struct WrapSquare {
+    /// `wrapText` is **required** by the OOXML `CT_WrapSquare` schema.
+    /// Word silently falls back to inline rendering when the attribute
+    /// is missing, which is why the fork previously modeled this
+    /// element as empty but nothing rendered.
+    #[xml(attr = "wrapText")]
+    pub wrap_text: Option<WrapTextType>,
+    /// Wrap padding, top. Measured in EMUs (English Metric Units).
+    #[xml(attr = "distT", with = "crate::rounded_float")]
+    pub dist_t: Option<isize>,
+    /// Wrap padding, bottom.
+    #[xml(attr = "distB", with = "crate::rounded_float")]
+    pub dist_b: Option<isize>,
+    /// Wrap padding, left.
+    #[xml(attr = "distL", with = "crate::rounded_float")]
+    pub dist_l: Option<isize>,
+    /// Wrap padding, right.
+    #[xml(attr = "distR", with = "crate::rounded_float")]
+    pub dist_r: Option<isize>,
+}
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
@@ -163,6 +182,16 @@ pub struct PositionHorizontal {
     pub relative_from: Option<RelativeFromH>,
     #[xml(flatten_text = "wp:posOffset", with = "crate::rounded_float")]
     pub pos_offset: Option<isize>,
+    /// Horizontal anchor alignment relative to `relative_from`.
+    ///
+    /// Per OOXML `CT_PosH`, `<wp:posOffset>` and `<wp:align>` are a mutually
+    /// exclusive choice — a given `<wp:positionH>` carries either an offset
+    /// or an alignment, never both. This struct does not enforce that at the
+    /// type level; callers are responsible for only setting one of
+    /// `pos_offset` / `align`. Setting both will emit both child elements,
+    /// and Word will silently prefer one (matching schema-level behavior).
+    #[xml(flatten_text = "wp:align")]
+    pub align: Option<PosHAlign>,
 }
 
 #[derive(Debug, Default, XmlRead, XmlWrite, Clone)]
@@ -173,6 +202,16 @@ pub struct PositionVertical {
     pub relative_from: Option<RelativeFromV>,
     #[xml(flatten_text = "wp:posOffset", with = "crate::rounded_float")]
     pub pos_offset: Option<isize>,
+    /// Vertical anchor alignment relative to `relative_from`.
+    ///
+    /// Per OOXML `CT_PosV`, `<wp:posOffset>` and `<wp:align>` are a mutually
+    /// exclusive choice — a given `<wp:positionV>` carries either an offset
+    /// or an alignment, never both. This struct does not enforce that at the
+    /// type level; callers are responsible for only setting one of
+    /// `pos_offset` / `align`. Setting both will emit both child elements,
+    /// and Word will silently prefer one (matching schema-level behavior).
+    #[xml(flatten_text = "wp:align")]
+    pub align: Option<PosVAlign>,
 }
 
 __define_enum! {
@@ -198,6 +237,33 @@ __define_enum! {
         BottomMargin= "bottomMargin",//	Right Margin
         InsideMargin= "insideMargin",//	Inside Margin
         OUtsideMargin= "outsideMargin",//	Outside Margin
+    }
+}
+
+// Horizontal anchor alignment enum for `<wp:positionH><wp:align>`.
+//
+// Named `PosHAlign` (not `HAlign`) to avoid any future collision with the
+// `VAlign` used for table-cell vertical alignment in `formatting`.
+__define_enum! {
+    PosHAlign {
+        Left = "left",
+        Right = "right",
+        Center = "center",
+        Inside = "inside",
+        Outside = "outside",
+    }
+}
+
+// Vertical anchor alignment enum for `<wp:positionV><wp:align>`.
+//
+// Named `PosVAlign` to avoid collision with `formatting::VAlign`.
+__define_enum! {
+    PosVAlign {
+        Top = "top",
+        Bottom = "bottom",
+        Center = "center",
+        Inside = "inside",
+        Outside = "outside",
     }
 }
 
@@ -448,4 +514,63 @@ pub struct Extent {
 
     #[xml(default, attr = "cy")]
     pub cy: u64,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use hard_xml::{XmlRead, XmlWrite};
+
+    #[test]
+    fn position_horizontal_align_round_trip() -> hard_xml::XmlResult<()> {
+        let ph = PositionHorizontal {
+            relative_from: Some(RelativeFromH::Margin),
+            pos_offset: None,
+            align: Some(PosHAlign::Left),
+        };
+        let xml = r#"<wp:positionH relativeFrom="margin"><wp:align>left</wp:align></wp:positionH>"#;
+        assert_eq!(xml, ph.to_string()?);
+        assert_eq!(ph, PositionHorizontal::from_str(xml)?);
+        Ok(())
+    }
+
+    #[test]
+    fn position_vertical_align_round_trip() -> hard_xml::XmlResult<()> {
+        let pv = PositionVertical {
+            relative_from: Some(RelativeFromV::Paragraph),
+            pos_offset: None,
+            align: Some(PosVAlign::Top),
+        };
+        let xml =
+            r#"<wp:positionV relativeFrom="paragraph"><wp:align>top</wp:align></wp:positionV>"#;
+        assert_eq!(xml, pv.to_string()?);
+        assert_eq!(pv, PositionVertical::from_str(xml)?);
+        Ok(())
+    }
+
+    #[test]
+    fn position_horizontal_pos_offset_still_works() -> hard_xml::XmlResult<()> {
+        let ph = PositionHorizontal {
+            relative_from: Some(RelativeFromH::Column),
+            pos_offset: Some(914400),
+            align: None,
+        };
+        let xml = r#"<wp:positionH relativeFrom="column"><wp:posOffset>914400</wp:posOffset></wp:positionH>"#;
+        assert_eq!(xml, ph.to_string()?);
+        assert_eq!(ph, PositionHorizontal::from_str(xml)?);
+        Ok(())
+    }
+
+    #[test]
+    fn position_vertical_pos_offset_still_works() -> hard_xml::XmlResult<()> {
+        let pv = PositionVertical {
+            relative_from: Some(RelativeFromV::Paragraph),
+            pos_offset: Some(0),
+            align: None,
+        };
+        let xml = r#"<wp:positionV relativeFrom="paragraph"><wp:posOffset>0</wp:posOffset></wp:positionV>"#;
+        assert_eq!(xml, pv.to_string()?);
+        assert_eq!(pv, PositionVertical::from_str(xml)?);
+        Ok(())
+    }
 }
