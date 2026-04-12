@@ -4,11 +4,12 @@
 #![allow(unused_must_use)]
 
 mod charset;
+mod embed;
 mod family;
 mod font;
 mod pitch;
 
-pub use self::{charset::*, family::*, font::*, pitch::*};
+pub use self::{charset::*, embed::*, family::*, font::*, pitch::*};
 
 use hard_xml::{XmlRead, XmlResult, XmlWrite, XmlWriter};
 use std::io::Write;

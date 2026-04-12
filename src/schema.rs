@@ -31,6 +31,19 @@ pub const SCHEMA_CUSTOM: &str =
     "http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties";
 pub const SCHEMA_FONT_TABLE: &str =
     "http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable";
+/// Relationship type for an embedded font binary referenced from
+/// `word/fontTable.xml`'s `<w:embedRegular>` / `<w:embedBold>` /
+/// `<w:embedItalic>` / `<w:embedBoldItalic>` child elements.
+///
+/// The binary itself lives under `word/fonts/fontN.ttf` (or `.odttf`
+/// when XOR-obfuscated per the OOXML `obfuscatedFont` content type).
+/// The relationship that links a `<w:font>` entry to its on-disk
+/// binary uses this schema, lives inside `word/_rels/fontTable.xml.rels`
+/// (NOT `word/_rels/document.xml.rels` — font binaries are relations
+/// of the fontTable part, not of the document), and is referenced
+/// from the Embed element's `r:id` attribute.
+pub const SCHEMA_FONT: &str =
+    "http://schemas.openxmlformats.org/officeDocument/2006/relationships/font";
 pub const SCHEMA_STYLES: &str =
     "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles";
 pub const SCHEMA_FOOTNOTES: &str =

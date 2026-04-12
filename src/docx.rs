@@ -46,6 +46,15 @@ pub struct Docx<'a> {
     pub document: Document<'a>,
     /// Specifies the font table part
     pub font_table: Option<FontTable<'a>>,
+    /// Part-level relationships for `word/fontTable.xml`. Lives in
+    /// `word/_rels/fontTable.xml.rels` and references embedded font
+    /// binaries (via [`crate::schema::SCHEMA_FONT`]) that each
+    /// `<w:embedRegular>` / `<w:embedBold>` / `<w:embedItalic>` /
+    /// `<w:embedBoldItalic>` child of a `<w:font>` entry resolves
+    /// against. Kept separate from [`Self::document_rels`] because
+    /// font binaries are relations of the fontTable part, not of the
+    /// main document.
+    pub font_table_rels: Option<Relationships<'a>>,
     /// Specifies the style definitions part
     pub styles: Styles<'a>,
     /// Specifies the package-level relationship to the main document part
@@ -57,6 +66,14 @@ pub struct Docx<'a> {
     pub footers: HashMap<String, Footer<'a>>,
     pub themes: HashMap<String, Theme<'a>>,
     pub media: HashMap<String, (MediaType, &'a Vec<u8>)>,
+    /// Embedded font binaries keyed by zip-relative path (e.g.
+    /// `fonts/font1.ttf`). Written under `word/` during
+    /// [`Self::write`]. Each entry is referenced by a relationship in
+    /// [`Self::font_table_rels`] whose `Target` matches the key and
+    /// whose `Type` is [`crate::schema::SCHEMA_FONT`]. Callers are
+    /// expected to populate this map and the corresponding rels
+    /// together so the rIds on `Font.embed_*` children resolve.
+    pub font_binaries: HashMap<String, Cow<'a, [u8]>>,
     pub footnotes: Option<FootNotes<'a>>,
     pub endnotes: Option<EndNotes<'a>>,
     pub settings: Option<Settings<'a>>,
@@ -195,8 +212,21 @@ impl<'a> Docx<'a> {
             Some(self.comments)       => "word/comments.xml"
             Some(self.numbering)      => "word/numbering.xml"
             Some(self.document_rels)  => "word/_rels/document.xml.rels"
+            Some(self.font_table_rels) => "word/_rels/fontTable.xml.rels"
             Some(self.settings_rels)  => "word/_rels/settings.xml.rels"
         );
+
+        // Write embedded font binaries. Mirror of the `self.media`
+        // loop below — the only difference is the path prefix (`fonts/`
+        // vs `media/`) and the source type (`Cow<'a, [u8]>` vs
+        // `&'a Vec<u8>`). Content-type handling is via a Default
+        // extension entry in `[Content_Types].xml`;
+        // caller registers that before calling write.
+        for (rel_path, bytes) in &self.font_binaries {
+            let file_path = format!("word/{rel_path}");
+            writer.inner.start_file(file_path, opt)?;
+            writer.inner.write_all(bytes.as_ref())?;
+        }
 
         for hd in self.headers.iter() {
             let file_path = format!("word/{}", hd.0);
@@ -375,8 +405,17 @@ impl<'a> Docx<'a> {
             Some(self.comments)       => "word/comments.xml"
             Some(self.numbering)      => "word/numbering.xml"
             Some(self.document_rels)  => "word/_rels/document.xml.rels"
+            Some(self.font_table_rels) => "word/_rels/fontTable.xml.rels"
             Some(self.settings_rels)  => "word/_rels/settings.xml.rels"
         );
+
+        // Async counterpart of the sync path's font-binary loop.
+        // Kept in lock-step so the two write paths don't drift.
+        for (rel_path, bytes) in &self.font_binaries {
+            let file_path = format!("word/{rel_path}");
+            let opt = ZipEntryBuilder::new(file_path.as_str().into(), Compression::Deflate);
+            writer.write_entry_whole(opt, bytes.as_ref()).await?;
+        }
 
         for (filename, content) in self.headers.iter() {
             let file_path = format!("word/{}", filename);
@@ -725,6 +764,15 @@ impl DocxFile {
             document_rels,
             settings_rels,
             font_table,
+            // Parsing an existing DOCX leaves the font-embedding
+            // maps empty. The parse path doesn't yet lift
+            // `word/_rels/fontTable.xml.rels` or the binaries under
+            // `word/fonts/` out of the zip; re-serializing a
+            // round-tripped DOCX therefore drops any embedded font
+            // data.
+            // fonts, so this is acceptable for the current scope.
+            font_table_rels: None,
+            font_binaries: HashMap::new(),
             rels,
             styles,
             headers,
