@@ -139,10 +139,18 @@ impl<'a> ParagraphProperty<'a> {
 
     /// Apply a native DOCX drop cap frame to this paragraph.
     ///
-    /// This emits `<w:framePr w:dropCap="drop" w:lines="..."/>`, which Word
-    /// renders as a standard paragraph drop cap.
+    /// Emits `<w:framePr w:dropCap="drop" w:lines="..." w:wrap="around"
+    /// w:vAnchor="text" w:hAnchor="text"/>` — the complete attribute set
+    /// Word expects for a paragraph-level drop cap.
     pub fn drop_cap(mut self, lines: isize) -> Self {
-        self.frame_pr = Some(FramePr::default().drop_cap(FrameDropCap::Drop).lines(lines));
+        self.frame_pr = Some(
+            FramePr::default()
+                .drop_cap(FrameDropCap::Drop)
+                .lines(lines)
+                .wrap(FrameWrap::Around)
+                .v_anchor(FrameAnchor::Text)
+                .h_anchor(FrameAnchor::Text),
+        );
         self
     }
 }
@@ -196,11 +204,23 @@ pub struct FramePr {
     /// Number of lines the drop cap spans.
     #[xml(attr = "w:lines", with = "crate::rounded_float")]
     pub lines: Option<isize>,
+    /// Text wrapping mode. "around" for drop caps.
+    #[xml(attr = "w:wrap")]
+    pub wrap: Option<FrameWrap>,
+    /// Vertical anchor: "text", "margin", or "page".
+    #[xml(attr = "w:vAnchor")]
+    pub v_anchor: Option<FrameAnchor>,
+    /// Horizontal anchor: "text", "margin", or "page".
+    #[xml(attr = "w:hAnchor")]
+    pub h_anchor: Option<FrameAnchor>,
 }
 
 impl FramePr {
     __setter!(drop_cap: Option<FrameDropCap>);
     __setter!(lines: Option<isize>);
+    __setter!(wrap: Option<FrameWrap>);
+    __setter!(v_anchor: Option<FrameAnchor>);
+    __setter!(h_anchor: Option<FrameAnchor>);
 }
 
 __define_enum! {
@@ -208,6 +228,25 @@ __define_enum! {
         None = "none",
         Drop = "drop",
         Margin = "margin",
+    }
+}
+
+__define_enum! {
+    FrameWrap {
+        Around = "around",
+        Auto = "auto",
+        None = "none",
+        NotBeside = "notBeside",
+        Through = "through",
+        Tight = "tight",
+    }
+}
+
+__define_enum! {
+    FrameAnchor {
+        Text = "text",
+        Margin = "margin",
+        Page = "page",
     }
 }
 
@@ -525,5 +564,5 @@ __xml_test_suites!(
     ParagraphProperty::default().frame_pr(FramePr::default()),
     r#"<w:pPr><w:framePr/></w:pPr>"#,
     ParagraphProperty::default().drop_cap(3),
-    r#"<w:pPr><w:framePr w:dropCap="drop" w:lines="3"/></w:pPr>"#,
+    r#"<w:pPr><w:framePr w:dropCap="drop" w:lines="3" w:wrap="around" w:vAnchor="text" w:hAnchor="text"/></w:pPr>"#,
 );

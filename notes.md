@@ -256,7 +256,7 @@ From `tables_complex.docx`:
 
 ## Usage After Implementation
 
-### In Lacuna (consumer code)
+### In (consumer code)
 
 ```rust
 // Extract colspan
