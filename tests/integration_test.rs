@@ -438,3 +438,44 @@ fn parse_malformed_closing_tag_with_trailing_space() {
         "Text after hyperlink should be extractable"
     );
 }
+
+#[test]
+fn parse_document_background_color() {
+    // color-sample.docx has <w:background w:color="00B050"/> as the first
+    // child of <w:document>. Verifies that the optional `Document.background`
+    // field is populated and that text runs still parse afterwards.
+    let path = std::path::Path::new("./tests/aaa/color-sample.docx");
+    let book = DocxFile::from_file(path).expect("Should open color-sample.docx");
+    let docx = book.parse().expect("Should parse color-sample.docx");
+
+    let background = docx
+        .document
+        .background
+        .as_ref()
+        .expect("Document.background should be Some for color-sample.docx");
+    assert_eq!(
+        background.color.as_deref(),
+        Some("00B050"),
+        "Background color should be the green page tint from <w:background w:color=\"00B050\"/>"
+    );
+
+    // Body should still parse: the first paragraph contains the word "Shift".
+    let text = docx.document.body.text();
+    assert!(
+        text.contains("Shift"),
+        "Body text should still be readable after Background is consumed; got: {text:?}"
+    );
+}
+
+#[test]
+fn parse_document_without_background_has_none() {
+    // aa.docx has no <w:background> element, so the field must be None.
+    let path = std::path::Path::new("./tests/aaa/aa.docx");
+    let book = DocxFile::from_file(path).expect("Should open aa.docx");
+    let docx = book.parse().expect("Should parse aa.docx");
+
+    assert!(
+        docx.document.background.is_none(),
+        "Document.background must be None when <w:background> is absent"
+    );
+}

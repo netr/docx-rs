@@ -9,13 +9,17 @@ use std::io::Write;
 use crate::__xml_test_suites;
 use crate::schema::{SCHEMA_MAIN, SCHEMA_RELATIONSHIPS_DOCUMENT, SCHEMA_WORDML_14, SCHEMA_WP};
 
-use crate::document::{Body, BodyContent};
+use crate::document::{Background, Body, BodyContent};
 
 /// The root element of the main document part.
 #[derive(Debug, Default, XmlRead, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 #[xml(tag = "w:document")]
 pub struct Document<'a> {
+    /// Optional page background color for the document. When present, this is
+    /// the first child of `<w:document>` and precedes `<w:body>`.
+    #[xml(child = "w:background")]
+    pub background: Option<Background<'a>>,
     /// Specifies the body of the docment.
     #[xml(child = "w:body")]
     pub body: Body<'a>,
@@ -30,7 +34,7 @@ impl<'a> Document<'a> {
 
 impl<'a> XmlWrite for Document<'a> {
     fn to_writer<W: Write>(&self, writer: &mut XmlWriter<W>) -> XmlResult<()> {
-        let Document { body } = self;
+        let Document { background, body } = self;
 
         log::debug!("[Document] Started writing.");
         let _ = write!(writer.inner, "{}", crate::schema::SCHEMA_XML);
@@ -46,6 +50,10 @@ impl<'a> XmlWrite for Document<'a> {
         writer.write_attribute("xmlns:r", SCHEMA_RELATIONSHIPS_DOCUMENT)?;
 
         writer.write_element_end_open()?;
+
+        if let Some(background) = background {
+            background.to_writer(writer)?;
+        }
 
         body.to_writer(writer)?;
 
